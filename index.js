@@ -1,4 +1,6 @@
 const express = require('express')
+const router = express.Router()
+const upload = require('./middleware/upload')
 //const {v4: uuid} = require('uuid')
 
 class Book {
@@ -7,9 +9,10 @@ class Book {
         title = '',
         description = '',
         authors = '',
-        favorite = '',
+        favorite = true,
         fileCover = '',
-        fileName = ''
+        fileName = '',
+        fileBook = ''
         ) {
         this.id = id
         this.title = title
@@ -18,23 +21,24 @@ class Book {
         this.favorite = favorite
         this.fileCover = fileCover
         this.fileName = fileName
+        this.fileBook = fileBook
     }
 }
 
 //Массив с тестовыми книгами
 let store = [
         new Book('1'),
-        new Book('2'),
-        new Book('3'),
-        new Book('4'),
+        new Book('2')
 ]
 
 const app = express()
 const PORT = process.env.PORT || 3000
 app.use(express.json())
+app.use(router);
+
 
 // Авторизация
-app.post('/api/user/login', (req,res) => {
+router.post('/api/user/login', (req,res) => {
     console.log('Авторизация')
     res.json({
         id: 1,
@@ -43,15 +47,17 @@ app.post('/api/user/login', (req,res) => {
 })
 
 //Запрос на все книги
-app.get('/api/books', (req,res) =>{
+router.get('/api/books', (req,res) =>{
     console.log('Запрос на все книги')
     res.json(store)
 })
 
 //Запрос по id
-app.get('/api/books/:id', (req,res) =>{
+router.get('/api/books/:id', (req,res) =>{
     console.log('Запрос на книгу по id')
-    const idb = req.params.id.split(':')[1] // Немного криво, т.к. не разобрался как чисто id получать
+    const idb = req.params.id
+
+    console.log(idb)
 
     const found = store.find(found => found.id === idb)
     if (found === undefined){
@@ -62,29 +68,58 @@ app.get('/api/books/:id', (req,res) =>{
 })
 
 //Создание новой книги
-app.post('/api/books', (req, res) => {
+router.post('/api/books',
+    upload.single('book'),
+    (req, res) => {
     const params = req.body
 
-    const newBook = new Book(
-        id = (store.length + 1),
-        title = params.title,
-        description = params.description,
-        authors = params.authors,
-        favorite = params.favorite,
-        fileCover = params.fileCover,
-        fileName = params.fileName
-    )
+    if (req.file){
 
-    store.push(newBook)
+        const newBook = new Book(
+            id = (store.length + 1).toString(), // Приводим к строке, чтобы можно было искать нормально
+            title = params.title,
+            description = params.description,
+            authors = params.authors,
+            favorite = params.favorite,
+            fileCover = params.fileCover,
+            fileName = params.fileName,
+            fileBook = req.file.path
+        )
 
-    res.status(202).json(newBook)
+        store.push(newBook)
+
+        res.status(202).json(newBook)
+
+    } else {
+
+        // Без файла книги теперь создать её нельзя
+        res.status(400).json({err:'Не прикреплен файл книги'})
+
+    }
+
+
+})
+
+//Запрос на скачивание файла книги
+router.get('/api/books/:id/download', (req, res) => {
+    console.log('Запрос на скачивание файла книги по id')
+    const idb = req.params.id
+
+    const found = store.find(found => found.id === idb)
+    if (found === undefined){
+        res.status(404).json({error:'Книга не найдена'})
+    } else {
+        res.download(found.fileBook)
+    }
 })
 
 //Редактирование книги по id
-app.put('/api/books/:id', (req, res) => {
+router.put('/api/books/:id',
+    upload.single('book'),
+    (req, res) => {
     console.log('Редактирование книги по id')
     const params = req.body
-    const idb = req.params.id.split(':')[1]
+    const idb = req.params.id
 
     const found = store.find(found => found.id === idb)
 
@@ -98,6 +133,11 @@ app.put('/api/books/:id', (req, res) => {
         found.fileCover = params.fileCover,
         found.fileName = params.fileName
 
+        //Если есть файл книги, то меняем его на тот, который прислали
+        if (req.file){
+            found.fileBook = req.file.path
+        }
+
         console.log(req.body)
 
         res.json(found)
@@ -106,10 +146,10 @@ app.put('/api/books/:id', (req, res) => {
 })
 
 //Удаление книги по id
-app.delete('/api/books/:id', (req, res) => {
+router.delete('/api/books/:id', (req, res) => {
     console.log('Удаление книги по id')
 
-    const idb = req.params.id.split(':')[1]
+    const idb = req.params.id
 
     const found = store.find(found => found.id === idb)
     if (found === undefined){

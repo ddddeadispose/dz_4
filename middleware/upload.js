@@ -1,11 +1,11 @@
 const multer = require('multer')
-const download = multer.diskStorage({
+const storage  = multer.diskStorage({
     destination(req, file, cb){
-        cb(null, 'books/img')
+        cb(null, 'books')
     },
-    filename(req, file, cb){
+    filename(req, file, cb) {
         cb(null, `${file.originalname}`)
     }
 })
 
-module.exports = multer({upload: download})
+module.exports = multer({storage})
