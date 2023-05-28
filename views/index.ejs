@@ -1,0 +1,44 @@
+<!-- index.ejs -->
+<html>
+<head>
+    <style>
+
+        * {
+            font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+            monospace;
+
+        }
+
+        a {
+            text-decoration: none; /* Убрать подчеркивание */
+            color: inherit; /* Наследовать цвет от родительского элемента */
+        }
+
+        .book {
+            font-size: 26px;
+            text-align: left;
+            margin-left: 15%;
+            margin-top: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 34px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Книги</h1>
+<div class="books">
+    <% books.forEach(function(book) { %>
+        <a href="/api/books/<%= book.id %>">
+            <div class="book"><%= book.id %>. <%= book.title %> </div>
+        </a>
+    <% }) %>
+        <a href="/api/add">
+            <div class="book"> Добавить книгу</div>
+        </a>
+</div>
+</body>
+</html>

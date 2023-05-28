@@ -1,0 +1,74 @@
+<!-- index.ejs -->
+<html>
+<head>
+    <style>
+
+        * {
+            font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+            monospace;
+
+        }
+
+        a {
+            text-decoration: none;
+            color: red;
+            font-size: 26px;
+            margin-left: 5%;
+        }
+
+        .book {
+            font-size: 26px;
+            text-align: left;
+            margin-left: 15%;
+            margin-top: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 34px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Редактирование книги <%= idb %></h1>
+<div class="books">
+    <form action="/api/books/<%= idb %>" method="POST" enctype="multipart/form-data">
+
+        <div class="book">
+            <label>Название:</label>
+            <textarea
+                    name="title"
+            ></textarea>
+        </div>
+
+        <div class="book">
+            <label>Описание:</label>
+            <textarea
+                    name="description"
+            ></textarea>
+        </div>
+
+        <div class="book">
+            <label>Авторы:</label>
+            <textarea
+                    name="authors"
+            ></textarea>
+        </div>
+
+        <div class="book">
+            <label for="fileBook">Файл книги:</label>
+            <input type="file" id="book" name="book" >
+        </div>
+
+        <div class="book">
+            <button type="submit">Отредактировать</button>
+        </div>
+
+    </form>
+    <a href="/api/books/">
+        Назад
+    </a>
+</div>
+</body>
+</html>

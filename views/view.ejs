@@ -1,0 +1,50 @@
+<!-- view.ejs -->
+<html>
+<head>
+    <style>
+
+        * {
+            font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+            monospace;
+
+        }
+
+        a {
+            text-decoration: none;
+            color: red;
+            font-size: 26px;
+            margin-left: 5%;
+        }
+
+        .book {
+            font-size: 26px;
+            text-align: left;
+            margin-left: 15%;
+            margin-top: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 34px;
+        }
+
+    </style>
+</head>
+<body>
+<h1><%= found.title %></h1>
+<div class="books">
+
+    <div class="book"><%= found.description %></div>
+    <div class="book"><%= found.authors %></div>
+    <div class="book"><%= found.fileCover %></div>
+
+    <a href="/api/books/">
+        Назад
+    </a>
+
+    <a href="/api/update/<%= found.id %>">
+        Редактировать книгу
+    </a>
+</div>
+</body>
+</html>

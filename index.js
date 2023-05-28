@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const ejs = require('ejs')
 const upload = require('./middleware/upload')
-//const {v4: uuid} = require('uuid')
 
 class Book {
     constructor(
@@ -27,15 +27,15 @@ class Book {
 
 //Массив с тестовыми книгами
 let store = [
-        new Book('1'),
-        new Book('2')
+        new Book('1', 'Тестовая книга 1'),
+        new Book('2', 'Тестовая книга 2')
 ]
 
 const app = express()
 const PORT = process.env.PORT || 3000
 app.use(express.json())
-app.use(router);
-
+app.use(router)
+app.set('view engine', 'ejs')
 
 // Авторизация
 router.post('/api/user/login', (req,res) => {
@@ -49,7 +49,9 @@ router.post('/api/user/login', (req,res) => {
 //Запрос на все книги
 router.get('/api/books', (req,res) =>{
     console.log('Запрос на все книги')
-    res.json(store)
+    console.log(store)
+    //res.json(store)
+    res.render('index', { books: store });
 })
 
 //Запрос по id
@@ -63,9 +65,14 @@ router.get('/api/books/:id', (req,res) =>{
     if (found === undefined){
         res.status(404).json({error:'Книга не найдена'})
     } else {
-        res.json(found)
+        res.render('view', { found: found });
     }
 })
+
+// Маршрут для отображения формы создания новой книги
+router.get('/api/add', (req, res) => {
+    res.render('create');
+});
 
 //Создание новой книги
 router.post('/api/books',
@@ -88,7 +95,9 @@ router.post('/api/books',
 
         store.push(newBook)
 
-        res.status(202).json(newBook)
+        console.log(newBook)
+
+        res.redirect('/api/books')
 
     } else {
 
@@ -96,7 +105,6 @@ router.post('/api/books',
         res.status(400).json({err:'Не прикреплен файл книги'})
 
     }
-
 
 })
 
@@ -114,7 +122,7 @@ router.get('/api/books/:id/download', (req, res) => {
 })
 
 //Редактирование книги по id
-router.put('/api/books/:id',
+router.post('/api/books/:id',
     upload.single('book'),
     (req, res) => {
     console.log('Редактирование книги по id')
@@ -140,10 +148,16 @@ router.put('/api/books/:id',
 
         console.log(req.body)
 
-        res.json(found)
+        res.redirect(`/api/books/${idb}`)
     }
 
 })
+
+// Маршрут для отображения формы редактирования новой книги
+router.get('/api/update/:id', (req, res) => {
+    const idb = req.params.id
+    res.render('update', { idb: idb });
+});
 
 //Удаление книги по id
 router.delete('/api/books/:id', (req, res) => {
