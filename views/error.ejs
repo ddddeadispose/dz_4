@@ -31,28 +31,14 @@
     </style>
 </head>
 <body>
-<h1><%= found.title %></h1>
+<h1><%= error %></h1>
 <div class="books">
-
-    <div class="book"><%= found.description %></div>
-    <div class="book"><%= found.authors %></div>
-    <div class="book"><%= found.fileCover %></div>
 
     <a href="/api/books/">
         Назад
     </a>
 
-    <a href="/api/update/<%= found.id %>">
-        Редактировать книгу
-    </a>
 
-    <a href="/api/books/<%= found.id %>/download">
-        Скачать
-    </a>
-
-    <div align="center">
-    Счетчик просмотров книги: <%= counter %>
-    </div>
 </div>
 </body>
 </html>
