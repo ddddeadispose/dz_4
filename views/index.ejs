@@ -33,7 +33,7 @@
 <div class="books">
     <% books.forEach(function(book) { %>
         <a href="/api/books/<%= book.id %>">
-            <div class="book"><%= book.id %>. <%= book.title %> </div>
+            <div class="book"><%= book.title %> </div>
         </a>
     <% }) %>
         <a href="/api/add">
