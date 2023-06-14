@@ -28,8 +28,9 @@ class Book {
     }
 }
 
-// Подключение к базе данных MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/books')
+// Подключение к базе данных MongoDB в контейнере
+
+mongoose.connect('mongodb://mongodb:27017')
     .then(() => {
         console.log('Подключено к базе данных');
     })
@@ -64,6 +65,7 @@ router.get('/', (req,res) =>{
     BookModel.find({})
         .then((books) => {
             books.forEach((book) => {
+
                 //Убираем дубликаты
                 const existingBook = store.find((storedBook) => storedBook.title === book.title);
 
@@ -104,8 +106,8 @@ router.get('/:id', async (req,res) => {
 
     //Пока убрал счетчик, т.к. он работал через докер, а как в докере организовать доступ к локальной БД я не знаю.
     // Запрос через аксиос на увеличение просмотра, и получение количества просмотров, отправляем на адрес внутри докера
-    //await axios.post(`http://counter:3001/api/counter/${idb}/incr`)
-    //const counter = await axios.get(`http://counter:3001/api/counter/${idb}`) , Переменная для view - counter: counter.data.value
+    await axios.post(`http://counter:3001/api/counter/${idb}/incr`)
+    const counter = await axios.get(`http://counter:3001/api/counter/${idb}`)
 
     try {
         const found = await BookModel.findOne({ id: idb });
@@ -113,7 +115,7 @@ router.get('/:id', async (req,res) => {
         if (!found) {
             res.render('error', { error: 'Книга не найдена' });
         } else {
-            res.render('view', { found: found });
+            res.render('view', { found: found, counter: counter.data.value });
         }
     } catch (err) {
         console.error('Ошибка при поиске книги в базе данных:', err);

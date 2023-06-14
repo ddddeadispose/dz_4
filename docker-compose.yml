@@ -14,7 +14,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3001:3001
-  mongo:
+  mongodb:
     image: mongo
     ports:
-      - 27017:27017
+      - '27017:27017'
+    volumes:
+      - ./data:/data/db
