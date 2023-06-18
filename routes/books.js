@@ -3,7 +3,10 @@ const upload = require("../middleware/upload");
 const router = express.Router();
 const axios = require('axios');
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+
+
+//Переменные окружения
+const counterUrl  = require('../config.js');
 
 //Определение класса книги
 class Book {
@@ -28,27 +31,8 @@ class Book {
     }
 }
 
-// Подключение к базе данных MongoDB в контейнере
-
-mongoose.connect('mongodb://mongodb:27017')
-    .then(() => {
-        console.log('Подключено к базе данных');
-    })
-    .catch((error) => {
-        console.error('Ошибка подключения к базе данных:', error);
-    });
-
-// Определение схемы книги
-const bookSchema = new Schema({
-    id: String,
-    title: String,
-    description: String,
-    authors: String,
-    favorite: String,
-    fileCover: String,
-    fileName: String,
-    fileBook: String,
-});
+// Схема книги
+const bookSchema = require('../models/bookSchema')
 
 // Определение модели книги
 const BookModel = mongoose.model('Book', bookSchema);
@@ -104,10 +88,9 @@ router.get('/:id', async (req,res) => {
 
     console.log(idb)
 
-    //Пока убрал счетчик, т.к. он работал через докер, а как в докере организовать доступ к локальной БД я не знаю.
     // Запрос через аксиос на увеличение просмотра, и получение количества просмотров, отправляем на адрес внутри докера
-    await axios.post(`http://counter:3001/api/counter/${idb}/incr`)
-    const counter = await axios.get(`http://counter:3001/api/counter/${idb}`)
+    await axios.post(`${counterUrl.counterUrl}${idb}/incr`)
+    const counter = await axios.get(`${counterUrl.counterUrl}${idb}`)
 
     try {
         const found = await BookModel.findOne({ id: idb });
